@@ -1,0 +1,59 @@
+🦈 Network Forensics & Traffic Analysis (Wireshark)
+As a security analyst, I leverage Wireshark to perform deep packet interrogation, moving beyond simple observation to reconstruct attack stories from raw network data
+. My proficiency covers the entire lifecycle of an investigation, from surgical filtering to payload extraction.
+🔍 Core Investigative Techniques
+The Forensic Mindset: I treat packet captures (PCAPs) as digital crime scenes, using TCP Stream Reconstruction to read full transcripts of attacker-victim conversations
+.
+Data Exfiltration Detection: I identify unauthorized data transfers by analyzing HTTP POST requests and sorting by packet size to find high-volume outbound flows
+.
+Beaconing Identification: I use I/O Graphs to visualize the "digital heartbeat" of compromised machines, spotting the rhythmic metronome patterns typical of Command & Control (C2) channels
+.
+Payload Extraction: I can surgically extract malicious files directly from the capture using Export Objects (HTTP/SMB) for isolated sandbox analysis
+.
+🛠️ Essential Display Filter Arsenal
+I use precise display filters to cut through the noise of hundreds of thousands of packets and isolate critical evidence
+.
+Reconnaissance & Scanning
+Filter
+Operational Purpose
+tcp.flags.syn == 1 && tcp.flags.ack == 0
+SYN Scan Detection: Identifies rapid "knocks" on many ports with no intention of completing the handshake
+.
+icmp.type == 8
+Ping Sweep: Detects attackers attempting to map active hosts on a subnet
+.
+tcp.flags.reset == 1
+Connection Refusal: Spots where security controls or closed ports are blocking traffic
+.
+Command & Control (C2) & DNS Hunting
+Filter
+Operational Purpose
+dns.qry.name.len > 50
+DNS Tunneling: Finds suspiciously long domain names used to smuggle data out of the network
+.
+tls.handshake.type == 1
+Client Hello Inspection: Identifies which external servers a host is attempting to connect to via SNI, even in encrypted traffic
+.
+tcp.port == 4444
+Uncommon C2 Ports: Specifically monitors ports frequently used by malicious frameworks
+.
+Web & Data Integrity
+Filter
+Operational Purpose
+http.request.method == "POST"
+Data Submission: Monitors for exfiltration or credential harvesting via web forms
+.
+http contains "password"
+Cleartext Leakage: Performs a raw byte search for unencrypted sensitive credentials
+.
+ip.addr == [Target IP]
+Host Isolation: Focuses the entire capture on traffic involving one specific machine
+.
+📈 Statistical Analysis & Automation
+I go beyond the GUI to analyze traffic at scale:
+Conversations & Endpoints: I use the Statistics menu to find "Top Talkers" and identify anomalies like a printer suddenly talking to an external IP in a foreign country
+.
+Protocol Hierarchy: I utilize this to instantly spot bit-torrent traffic or other non-business protocols on the wire
+.
+tshark Proficiency: I am comfortable using the command-line version of Wireshark for high-performance extraction of specific fields from massive PCAP files
+.
