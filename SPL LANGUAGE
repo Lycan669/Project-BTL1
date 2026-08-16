@@ -1,0 +1,46 @@
+1. La structure fondamentale : Le Pipeline (|)
+Le SPL fonctionne comme une chaîne de montage. Vous commencez par une recherche large, puis vous affinez les résultats en passant les données à travers des "tuyaux" (pipes)
+.
+Exemple : Recherche de base | Commande 1 | Commande 2
+2. Les commandes "Survie" (Les plus importantes)
+Selon vos sources, ces commandes constituent le cœur de l'arsenal d'un analyste SAL1
+ :
+stats count by : Agrège les données pour trouver les "Top Talkers" ou les attaquants les plus fréquents
+.
+Usage : Identifier quelle IP source tente le plus de connexions.
+dedup : Supprime les doublons pour afficher uniquement les valeurs uniques (ex: lister toutes les IP de destination uniques contactées par un hôte)
+.
+table : Nettoie l'affichage en ne gardant que les colonnes nécessaires. C'est essentiel pour prendre des captures d'écran nettes pour vos rapports d'incidents
+.
+sort : Ordonne les résultats. Utilisez sort - count pour mettre les chiffres les plus élevés en haut
+.
+timechart : Visualise les pics de trafic au fil du temps. C'est l'outil parfait pour repérer le DNS Tunneling ou une exfiltration massive
+.
+3. Les modificateurs de temps
+En SOC, le temps est une dimension critique. Vous devez limiter vos recherches pour ne pas être noyé par le bruit
+ :
+earliest=-24h : Restreint la recherche aux dernières 24 heures
+.
+earliest=-1h : Idéal pour se concentrer sur l'incident immédiat qui vient de déclencher une alerte.
+4. Requêtes "Pro-Level" pour le simulateur
+Voici des structures de requêtes directement utilisables dans vos examens THM :
+Détection de Brute Force (Windows Event ID 4625) :
+index=auth EventCode=4625 earliest=-24h | stats count by src_ip | sort - count
+Cette requête compte les échecs de connexion par IP source sur les dernières 24h et trie les plus agressifs en premier
+.
+Enrichissement de données (lookup) : Le SPL permet d'enrichir une alerte en comparant une IP ou un nom d'hôte à une liste externe (ex: liste des propriétaires d'actifs) pour savoir immédiatement si la machine cible est critique
+.
+5. Conversion Sigma vers SPL
+Dans certains exercices avancés, vous devrez utiliser des outils comme sigmac ou Uncoder.io pour transformer une règle de détection générique (Sigma) en requête Splunk
+.
+Exemple de résultat converti : (CommandLine="*--install*" CommandLine="*--start-with-win*" (CurrentDirectory="*C:\ProgramData\AnyDesk.exe*"))
+.
+Attention : Les requêtes converties nécessitent souvent un ajustement manuel pour corriger les caractères d'échappement comme les deux-points (:) ou les astérisques (*)
+.
+Conseils tactiques pour THM :
+Pivotez intelligemment : Prenez une adresse IP suspecte d'une alerte et lancez une recherche globale sur cette IP pour voir tout ce qu'elle a fait sur le réseau (HTTP, DNS, Logons)
+.
+Filtrez le bruit : Apprenez à écrire des requêtes précises pour ne pas renvoyer des milliers de lignes inutiles
+.
+Utilisez table pour vos rapports : Le moteur de correction AI de TryHackMe valorise la clarté technique. Présenter vos preuves sous forme de tableau SPL montre votre professionnalisme
+.
