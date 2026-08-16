@@ -1,0 +1,53 @@
+🔦 Maîtrise Avancée de l'Exploration Réseau (Nmap)
+En tant qu'analyste de sécurité, je considère Nmap comme mon "projecteur numérique" indispensable
+. Mon expertise s'étend de la découverte d'hôtes à l'audit de vulnérabilités complexe via le moteur NSE, en passant par les techniques d'évasion de pare-feu.
+🏗️ Fondamentaux et Mécaniques de Scan
+Je maîtrise les subtilités entre les différents types de scans et leur impact sur la visibilité système :
+Host Discovery (Ping Sweep) : Utilisation de -sn pour identifier les machines actives sans balayage de ports (shouting "Is anyone there?" down a hallway)
+.
+SYN Stealth Scan (-sS) : Ma méthode par défaut pour la rapidité et la discrétion. Ce scan "semi-ouvert" évite de compléter le handshake TCP, ce qui réduit les chances de détection dans les journaux applicatifs
+.
+TCP Connect Scan (-sT) : Utilisé lors d'analyses sans privilèges root, complétant l'intégralité du cycle de connexion
+.
+Aggressive Mode (-A) : Activation combinée de la détection d'OS (-O), de la version des services (-sV), du script scanning (-sC) et du traceroute en une seule passe
+.
+🤖 Nmap Scripting Engine (NSE) & Audit de Vulnérabilités
+Je transforme Nmap en une véritable plateforme d'évaluation de sécurité grâce aux 600+ scripts Lua disponibles
+.
+Catégories maîtrisées : safe, vuln, brute, exploit, malware, auth, et discovery
+.
+Workflows de détection de vulnérabilités :
+Scan de vulnérabilités intégré : Utilisation de --script vuln pour détecter les failles critiques comme EternalBlue (ms17-010), Heartbleed (ssl-heartbleed), ou Shellshock
+.
+CVE Matching : Intégration de scripts tiers comme vulners.nse pour faire correspondre les versions de services avec les bases de données CVE, filtrées par score de sévérité (mincvss=7.0)
+.
+Énumération spécifique : Utilisation de dns-brute pour découvrir des sous-domaines et http-enum pour cartographier les répertoires web
+.
+🪟 Investigation Windows & SMB (Deep Dive)
+Je possède une compétence spécialisée dans l'interrogation profonde des environnements Windows via les services SMB et MSRPC
+ :
+User Enumeration : Utilisation de smb-enum-users.nse (méthodes SAMR et bruteforce de RID) pour lister les comptes locaux
+.
+Share Analysis : Énumération des partages réseau (y compris cachés comme ADMIN$) via smb-enum-shares.nse
+.
+Digital Forensics : Inspection des sessions actives (smb-enum-sessions.nse) et des processus distants (smb-enum-processes.nse)
+.
+Credential Auditing : Tests de force brute rapides avec smb-brute.nse et extraction sécurisée de hashes via smb-pwdump.nse
+.
+🛡️ Évasion de Pare-feu et IDS (Advanced)
+Je sais manipuler les paquets pour contourner les contrôles de sécurité :
+Fragmentation : Utilisation de -f pour diviser les en-têtes TCP en fragments de 8 octets, rendant l'inspection difficile pour les IDS
+.
+Decoys (Leurres) : Emploi de -D pour masquer mon adresse IP réelle parmi une liste d'adresses aléatoires (RND:10) ou spécifiques
+.
+Source Port Spoofing : Utilisation de -g 53 ou -g 88 pour simuler du trafic DNS ou Kerberos et exploiter les règles de pare-feu trop permissives
+.
+Obfuscation : Ajout de données aléatoires aux paquets via --data-length pour altérer la signature du scan
+.
+📊 Workflow Professionnel & Automatisation
+Formats de Sortie : Exportation systématique via -oA pour obtenir simultanément les formats Normal (.nmap), Grepable (.gnmap) et XML (.xml)
+.
+Pipeline Linux Forensics : Maîtrise de l'extraction de données via des outils comme grep, awk et sed : cat scan.txt | grep "report" | awk '{print $5}' pour isoler uniquement les IPs d'une subnet
+.
+Intégration SIEM/SOC : Ingestion des résultats XML dans des outils comme Metasploit (db_import) ou la pile ELK pour le suivi historique des vulnérabilités
+.
