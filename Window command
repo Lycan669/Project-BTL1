@@ -1,0 +1,43 @@
+🪟 Windows Administration & Threat Hunting
+As a security analyst, I utilize native Windows binaries (LOLBins) and administrative commands to interrogate system states and detect adversary activity. My expertise focuses on identifying unauthorized changes and persistence mechanisms that standard security tools might miss.
+🛡️ Core Command Arsenal
+1. Situational Awareness & Privilege Audit
+Before an investigation begins, I establish the security context of the session and the system's patch level.
+whoami /priv: I use this to display the current user's enabled privileges. Finding SeDebugPrivilege or SeImpersonatePrivilege can indicate a high-risk session susceptible to token manipulation
+.
+hostname: Quickly identifies the asset name for cross-referencing with inventory databases
+.
+systeminfo: Provides a deep-dive into the OS version and installed hotfixes, essential for identifying missing security patches
+.
+2. Persistence Detection & Registry Forensics
+Attackers frequently abuse the Windows Registry and Task Scheduler to survive reboots. I monitor these areas for high-fidelity indicators of compromise.
+reg query [Key_Path]: I use this to inspect critical "Run" keys (e.g., HKLM\...\CurrentVersion\Run) where malware often hides its startup commands
+.
+schtasks /query /fo LIST /v: I leverage this to audit scheduled tasks. I look for unusual task names, scripts running from %TEMP% directories, or tasks executing under the SYSTEM account
+.
+sc query / sc qc [ServiceName]: I investigate service configurations to detect backdoor services. This maps directly to Windows Event ID 7045 (Service Installed), a primary persistence indicator
+.
+3. Network Reconnaissance & Diagnostics
+I identify lateral movement and unauthorized connections by mapping the host's network neighborhood.
+ipconfig /all: Used to determine the full network configuration, including DNS servers which may have been tampered with
+.
+arp -a: I use this to view the ARP table and detect potential ARP Spoofing or mapping of internal network neighbors
+.
+netstat -ano: A vital command for identifying active connections and the specific Process IDs (PIDs) associated with them, helping to link a suspicious port to a malicious binary
+.
+4. Account & Group Auditing
+Unauthorized account creation is a "red flag" for persistence. I audit user groups to find signs of privilege escalation
+.
+net user: Lists all local accounts to identify rogue users like "oldadministrator" often created during attacks
+.
+net localgroup Administrators: I use this to verify membership in the most privileged groups, catching attempts to escalate standard users to administrative status
+.
+🕵️ Analyst Perspective: Log Correlation
+I don't just run commands; I correlate their execution with Windows Event Logs to build an attack narrative
+:
+Event ID 4688: I monitor this for process creation to see the full command line of every binary executed
+.
+Event ID 4104: I use PowerShell Script Block Logging to capture and de-obfuscate malicious scripts at runtime
+.
+Event ID 4624/4625: I analyze successful and failed logons to detect Brute Force attacks and lateral movement patterns
+.
