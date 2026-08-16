@@ -1,0 +1,46 @@
+I started by learning he linux commands 
+Like 
+🐧 Linux & Unix System Forensics
+I am proficient in Unix-based administration, utilizing the command line for deep-dive file analysis and system auditing
+.
+Navigation & Discovery: I use ls -larth, pwd, and find to locate hidden artifacts and navigate system hierarchies
+.
+Text Processing: I leverage grep, awk, and sed for high-performance log parsing and extracting specific data points from large datasets
+.
+File Analysis: I employ cat, tail -f, and strings to monitor active logs and identify embedded text within binaries
+.
+Digital Forensics: For low-level inspection, I use xxd for hexadecimal viewing and diff to compare configuration changes
+.
+🪟 Windows Administration & Threat Hunting
+I specialize in using native Windows commands and Sysinternals tools to detect "Living off the Land" (LotL) techniques
+.
+Situational Awareness: I utilize whoami /priv, hostname, and systeminfo to determine current security contexts and patch levels
+.
+Persistence Detection: I use the reg query command to monitor startup keys and schtasks to identify unauthorized scheduled tasks
+.
+Account Auditing: I leverage net user and net localgroup to detect the unauthorized creation of administrative backdoors
+.
+Service Monitoring: I employ sc query to investigate newly installed services, a common indicator of high-fidelity persistence
+.
+🌐 Networking & Reconnaissance
+My networking skillset focuses on identifying anomalies at the protocol level and mapping attack surfaces
+.
+Network Diagnostics: I use ipconfig, arp -a, and netstat -ano to identify active connections and map internal network neighbors
+.
+Advanced Scanning: I am proficient in Nmap, using -sV for service fingerprinting and --script vuln to automate vulnerability detection
+.
+Data Transfer: I utilize curl and wget for testing web requests and investigating potential ingress tool transfers
+.
+Traffic Analysis: I apply surgical Wireshark display filters (e.g., tcp.flags.syn == 1) to identify reconnaissance and exfiltration attempts
+
+🛡️ Security Operations & Tooling
+I integrate specialized security tools to correlate data and automate the investigative workflow
+.
+Credential Testing: I use Hydra for authenticated service testing and password auditing across multiple protocols
+.
+Vulnerability Research: I employ searchsploit and exploit-db to identify and test exploits for specific CVEs identified during scanning
+.
+SIEM Operations: I write precise Splunk SPL (e.g., stats count by) and KQL queries to filter noise and identify true positive alerts
+.
+Detection Engineering: I work with Sigma rules and tools like sigmac to convert detection logic into actionable SIEM signatures
+.
