@@ -1,0 +1,62 @@
+🚀 TShark Mastery: High-Performance Network Forensics
+While Wireshark provides a vital graphical interface for packet analysis, TShark (the command-line version of Wireshark) is the tool of choice for the modern SOC Analyst
+. When dealing with multi-gigabyte packet captures (PCAPs) where a GUI would lag or crash, TShark allows for surgical data extraction and automated threat hunting
+.
+📉 Why TShark? (CLI vs. GUI)
+Feature
+TShark (CLI)
+Wireshark (GUI)
+Performance
+Handles massive PCAPs with minimal resource overhead
+.
+May lag or freeze with files exceeding several GBs
+.
+Automation
+Fully scriptable for cron jobs and real-time alerts
+.
+Requires manual interaction and human vision
+.
+Data Format
+Best for generating CSV/JSON for SIEM ingestion
+.
+Best for visual stream reconstruction and color-coded triage
+.
+🛡️ Module 1: Strategic Triage & Statistics
+Before looking at individual packets, an analyst must understand the "Top Talkers" on a network
+. TShark’s statistics module allows you to map entire conversations in seconds.
+Command: TCP Conversation Mapping
+tshark -r incident.pcap -q -z conv,tcp
+Operational Goal: Generates a summarized list of all TCP conversations
+.
+Analyst Insight: Sort by Bytes to instantly identify Data Exfiltration events where an internal host is uploading massive volumes to an external IP
+.
+🧬 Module 2: Surgical Field Extraction
+TShark’s power lies in its ability to ignore the noise and extract only the specific metadata required for a lead.
+Scenario 1: Hunting DNS Tunneling (C2 Detection)
+Attackers use long, random subdomains to smuggle data through the DNS protocol
+.
+tshark -r capture.pcap -Y "dns.flags.response == 0" -T fields -e frame.time -e ip.src -e dns.qry.name > dns_audit.txt
+Code Breakdown:
+-Y: Applies a display filter for DNS queries
+.
+-T fields: Tells TShark to output specific columns
+.
+-e dns.qry.name: Extracts only the queried domain
+.
+Operational Goal: Audit domain lookups for labels exceeding 50 characters, a primary indicator of DNS Tunneling
+.
+Scenario 2: Web Credential Harvesting
+Identifying unencrypted POST requests to hunt for stolen credentials
+.
+tshark -r web_traffic.pcap -Y 'http.request.method == "POST"' -T fields -e ip.src -e ip.dst -e http.host -e http.request.uri
+Operational Goal: Monitors all outbound data submissions
+. If a device with "no business" uploading data sends large POST requests to a foreign IP, it indicates a theft event
+.
+🏹 Module 3: Automated Threat Hunting
+By chaining TShark with Linux commands like grep, awk, and sort, you can build automated detectors for common attack patterns
+.
+Detection: Identifying Nmap SYN Scans
+tshark -r traffic.pcap -Y "tcp.flags.syn == 1 && tcp.flags.ack == 0" | awk '{print $3}' | sort | uniq -c | sort -nr
+Analyst Logic: This filter isolates SYN packets without corresponding ACKs
+. Using awk and sort reveals which source IP is sending the most "knocks" on digital doors, confirming the Reconnaissance phase of an attack in real-time
+.
