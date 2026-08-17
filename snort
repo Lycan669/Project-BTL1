@@ -1,0 +1,80 @@
+🐘 Snort Mastery: From Traffic Sniffing to Intrusion Prevention
+Snort is a legendary open-source, lightweight Network Intrusion Detection System (NIDS) and Intrusion Prevention System (NIPS)
+. Ranked as one of the most popular security tools globally, it allows analysts to manage network traffic based on specific, user-defined signatures known as Rules
+.
+⚙️ 1. Operational Architecture & Command Arsenal
+Snort operates in several modes. As an analyst, you must master the command-line flags that control how Snort processes data and alerts your team.
+Core Execution Flags
+-c: Defines the path to the configuration file (e.g., snort.conf). This file tells Snort which rules and preprocessors to load
+.
+-T: Configuration Test. Always run this after modifying rules to ensure there are no syntax errors before deployment
+.
+-v / -d / -X: Control verbosity, from basic headers to full packet payload dumps
+.
+-r: Read Mode. Processes a saved .pcap file through the rule engine instead of live traffic [Conversation History].
+-D: Daemon Mode. Runs Snort in the background for automated, permanent monitoring
+.
+Alerting Modes (-A)
+The alert mode determines the detail level of your incident logs
+:
+console: Fast-style alerts displayed directly in your terminal—best for live testing
+.
+cmg: Displays the rule header plus the full payload in hex and text, essential for payload-level triage
+.
+fast: Summary info (IPs, timestamp, msg) written to a log file; no console output
+.
+full: (Default) Records every possible detail about the alert to the log file
+.
+none: Disables alerting entirely while still generating binary traffic logs
+.
+📝 2. The Anatomy of a Snort Rule
+A rule is divided into two parts: the Header (mandatory) and the Options (enclosed in parentheses)
+.
+The Rule Header
+Structure: [Action] [Protocol] [Src_IP] [Src_Port] [Direction] [Dst_IP] [Dst_Port]
+Action: Common choices are alert (notify and log), log (silent log), drop (IPS mode: block and log), or reject (IPS mode: block and kill session)
+.
+Protocol: Snort 2 natively supports TCP, UDP, ICMP, and IP
+.
+IPs & Ports: Use any for universal matching or specific addresses/ranges (e.g., 192.168.1.0/24)
+.
+Negation (!): Use to exclude targets, such as !192.168.1.0/24 to monitor traffic outside your network
+.
+Direction: -> for one-way or <> for bidirectional traffic
+.
+🛠️ 3. Strategic Rule Examples (SOC Ready)
+Example 1: Basic ICMP (Ping) Detection
+alert icmp any any <> any any (msg: "ICMP Packet Found"; sid: 1000001; rev:1;)
+Analyst Insight: This is the baseline rule used to confirm Snort is seeing traffic correctly
+.
+Example 2: Detecting a TCP SYN Scan (Reconnaissance)
+alert tcp any any -> any any (msg: "TCP SYN Flag Detected"; flags:S; sid: 1000002; rev:1;)
+Logic: Uses the flags option to look for the Synchronize bit, a precursor to port scanning activity
+.
+Example 3: Content Matching (HTTP GET Request)
+alert tcp any any -> any 80 (msg: "GET Request Found"; content:"GET"; nocase; sid: 1000003; rev:1;)
+Logic: Filters TCP traffic on port 80 and performs a case-insensitive search for "GET" in the payload
+.
+Example 4: Optimized Multi-Pattern Matching
+alert tcp any any <> any 80 (msg: "HTTP GET for www"; content:"GET"; fast_pattern; content:"www"; sid:1000004; rev:1;)
+Logic: The fast_pattern modifier speeds up performance by telling Snort which string to search for first
+.
+🛡️ 4. Transitioning to IPS Mode (Blocking Traffic)
+Snort defaults to passive IDS mode. To turn it into an IPS that actively drops malicious packets, you must sit "inline" between network segments
+.
+Activation Command:
+sudo snort -c /etc/snort/snort.conf -Q --daq afpacket -i eth0:eth1 -A console
+Key Requirements:
+Multiple Interfaces: IPS mode requires at least two interfaces (e.g., eth0:eth1) to pass traffic through the engine
+.
+Action Change: You must change your rule action from alert to drop or reject
+.
+💡 5. Senior Analyst "Pro-Tips"
+SIDs (Security IDs): Always use a SID ≥ 1,000,000 for your custom rules to avoid overlapping with built-in rules (100–999,999)
+.
+Rule Location: Store your custom rules in /etc/snort/rules/local.rules
+.
+Evasion Awareness: Skilled attackers can bypass IDS rules using fragmentation (-f in Nmap) or timing controls
+.
+References: Always include a reference:cve,[ID]; in your rules. This helps junior analysts understand exactly which threat they are investigating
+.
