@@ -1,0 +1,55 @@
+. Core Cybersecurity Foundations
+Cybersecurity: The practice of protecting digital assets, networks, and data from unauthorized access and increasingly sophisticated digital threats
+.
+Vulnerability: A specific weakness in a system's design, implementation, or internal control that a threat actor could exploit to cause harm
+.
+Encryption: The process of encoding messages or information so that only authorized parties can access the original content
+.
+Indicators of Compromise (IoC): Forensic evidence that an attack has already occurred, such as specific file hashes, malicious IPs, or known bad domains
+.
+Indicators of Attack (IoA): Evidence focused on the intent and behavior while an attack is currently in progress, allowing for proactive detection
+.
+2. Common Cyber Threats & Attack Vectors
+Phishing: A deceptive technique using fraudulent digital communications (typically email) to trick individuals into revealing sensitive information
+.
+Malware: Any software intentionally designed to cause damage to a computer, server, client, or computer network
+.
+Ransomware: A type of malware that encrypts a victim's data, with the attacker demanding a ransom payment to provide a decryption key
+.
+DDoS (Distributed Denial-of-Service): A malicious attempt to disrupt the normal traffic of a targeted server or network by overwhelming the target with a flood of Internet traffic from multiple sources
+.
+SQL Injection (SQLi): A code injection technique where malicious SQL statements are inserted into entry fields for execution to manipulate a database
+.
+Man-in-the-Middle (MITM): An attack where the perpetrator secretly intercepts and potentially alters the communication between two parties who believe they are directly communicating
+.
+3. Defensive Frameworks & Methodologies
+Pyramid of Pain: A conceptual model used to rank Indicators of Compromise by how much "pain" or effort it costs an attacker to change them (e.g., changing a Hash is trivial, while changing TTPs is tough)
+.
+Cyber Kill Chain: A framework tracking the seven stages of a cyberattack, from initial Reconnaissance to final Actions on Objectives
+.
+MITRE ATT&CK: A globally accessible knowledge base of adversary tactics and techniques based on real-world observations, used to map specific attacker behaviors
+.
+OSI Model: A seven-layer standardized framework (Physical to Application) that defines how data is communicated between network systems
+.
+4. Security Tools & Orchestration Components
+SIEM (Security Information and Event Management): A reactive monitoring system used to store, correlate, and analyze logs from across an organization to detect security incidents
+.
+SOAR (Security Orchestration, Automation, and Response): Platforms designed to integrate disparate security tools and automate incident response tasks through standardized playbooks
+.
+IDS (Intrusion Detection System): A device or software application that monitors a network or systems for malicious activity or policy violations
+.
+IPS (Intrusion Prevention System): An advanced system that not only detects intrusions but can also actively block or drop malicious packets
+.
+Sysmon (System Monitor): A free Microsoft tool that provides detailed Windows event logs, including process creation with full command lines and binary hashes
+.
+Nmap (Network Mapper): An open-source tool used for network discovery, port scanning, and security auditing
+.
+Wireshark: A legendary network protocol analyzer used to capture and interactively browse the traffic running on a computer network at the packet level
+.
+5. Email Authentication & Integrity
+SPF (Sender Policy Framework): A DNS record that lists the authorized IP addresses allowed to send email on behalf of a domain
+.
+DKIM (DomainKeys Identified Mail): A digital signature added to an email that allows the receiver to verify that the email was indeed authorized by the owner of that domain and was not altered
+.
+DMARC: A policy layer that uses SPF and DKIM to tell the receiving mail server how to handle emails that fail authentication (e.g., Reject or Quarantine)
+.
