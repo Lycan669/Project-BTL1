@@ -1,0 +1,103 @@
+import re
+import math
+import sys
+
+
+class SOCHashAnalyzer:
+    def __init__(self):
+        # Base de données étendue pour une précision maximale
+        # Basée sur les standards rencontrés dans les labos SAL1 (NTLM, SHA-256, etc.)
+        self.hash_db = {
+            16: {"name": "Cisco-PIX / Half-MD5", "type": "Legacy / Network Device"},
+            32: {"name": "NTLM (Windows) / MD5", "type": "Windows Authentication / File Integrity"},
+            40: {"name": "SHA-1", "type": "Legacy Signature"},
+            48: {"name": "Haval-192", "type": "Cryptographic Hash"},
+            56: {"name": "SHA-224", "type": "Cryptographic Hash"},
+            64: {"name": "SHA-256", "type": "Digital Forensics / Modern Integrity"},
+            96: {"name": "SHA-384", "type": "High-Security Signature"},
+            128: {"name": "SHA-512", "type": "Linux Shadow Passwords / Modern Systems"}
+        }
+
+    def calculate_entropy(self, data):
+        """Calcule l'entropie de Shannon pour vérifier si la chaîne est 'aléatoire' comme un vrai hash."""
+        if not data: return 0
+        entropy = 0
+        for x in range(256):
+            p_x = float(data.count(chr(x))) / len(data)
+            if p_x > 0:
+                entropy += - p_x * math.log(p_x, 2)
+        return entropy
+
+    def validate_format(self, h):
+        """Vérifie si la chaîne est strictement hexadécimale (0-9, a-f)."""
+        return bool(re.match(r"^[0-9a-fA-F]+$", h))
+
+    def analyze(self, hash_input):
+        h = hash_input.strip()
+
+        print("\n" + "=" * 60)
+        print(f"🔍 ANALYSE TECHNIQUE DU HASH : {h[:16]}...")
+        print("=" * 60)
+
+        # 1. Validation du format
+        if not self.validate_format(h):
+            print("[!] ÉCHEC : Ce n'est pas un hash reconnu par le fichier.")
+            print("    -> Motif : La chaîne contient des caractères non-hexadécimaux.")
+            return
+
+        # 2. Métriques structurelles
+        length = len(h)
+        bits = length * 4  # Chaque caractère hex = 4 bits
+        entropy = self.calculate_entropy(h)
+
+        print(f"[*] Longueur détectée : {length} caractères ({bits} bits)")
+        print(f"[*] Entropie de Shannon : {entropy:.4f}")
+
+        # 3. Identification de précision
+        if length in self.hash_db:
+            info = self.hash_db[length]
+            print(f"\n[+] TYPE IDENTIFIÉ : {info['name']}")
+            print(f"[+] CATÉGORIE      : {info['type']}")
+
+            # Insights spécifiques SOC basés sur les sources TryHackMe
+            self._display_analyst_notes(length)
+        else:
+            print(f"\n[?] RÉSULTAT INCONNU : La longueur ({length}) ne correspond à aucune signature standard.")
+            print("    Conseil : Vérifiez s'il s'agit d'un hash 'salé' ou d'un format propriétaire.")
+
+    def _display_analyst_notes(self, length):
+        """Fournit des conseils de 'Senior Analyst' basés sur votre formation [1-3]."""
+        print("\n" + "-" * 30)
+        print("💡 NOTES DE L'ANALYSTE (SOC INSIGHTS)")
+
+        if length == 32:
+            print("- Ce hash est typique du protocole SMB [3].")
+            print("- Alerte : Si trouvé dans un dump, il peut être utilisé pour une attaque 'Pass-the-Hash' [4].")
+        elif length == 64:
+            print("- Ce format est le standard actuel pour garantir l'intégrité des fichiers PCAP/Logs [2].")
+            print("- Vérifiez si ce hash correspond à la signature officielle du logiciel audité.")
+        elif length == 128:
+            print("- Probablement extrait d'un fichier Linux /etc/shadow [5].")
+            print("- Indique une configuration système moderne et sécurisée.")
+        print("-" * 30)
+
+
+def main():
+    analyzer = SOCHashAnalyzer()
+    print("🚀 SOC Intelligence Tool - Hash Identifier v2.0")
+
+    while True:
+        try:
+            target = input("\n[>] Entrez le hash à identifier (ou 'exit' pour quitter) : ").lower().strip()
+            if target == 'exit': break
+            if not target: continue
+
+            analyzer.analyze(target)
+
+        except KeyboardInterrupt:
+            print("\n[!] Sortie du programme...")
+            break
+
+
+if __name__ == "__main__":
+    main()
