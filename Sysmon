@@ -1,0 +1,16 @@
+Event id
+ID	Événement
+1	Process Creation
+2	File creation time changed
+3	Network Connection
+5	Process terminated
+6	Driver loaded
+7	Image loaded
+8	CreateRemoteThread
+10	Process Access
+11	File Create
+12	Registry object create/delete
+13	Registry value set
+14	Registry object rename
+15	FileCreateStreamHash
+22	DNS Query
