@@ -8,8 +8,11 @@ Windows Security Event Logs: Event ID 4625 (An account failed to log on)
 .
 Kerberos Telemetry: Event ID 4771 (Kerberos pre-authentication failed), which provides a domain-controller-side view of failed attempts
 .
+
 Sysmon: Event ID 3 (Network connection) to correlate failed logons with specific source IP addresses
 .
+
+
 KQL (Microsoft Sentinel/Defender)
 // Hunting for one IP hitting multiple accounts
 DeviceLogonEvents
@@ -20,6 +23,8 @@ DeviceLogonEvents
 | sort by FailedAccountCount desc
 Logic: This query identifies a single source IP address attempting to log into more than 10 unique accounts within a one-hour window
 .
+
+
 SPL (Splunk)
 index=auth EventCode=4625 earliest=-24h 
 | stats count(TargetUserName) as total_failures, dc(TargetUserName) as unique_accounts by src_ip 
