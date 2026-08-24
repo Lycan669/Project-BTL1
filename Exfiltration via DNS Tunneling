@@ -1,0 +1,42 @@
+Threat Hunt — Exfiltration via DNS Tunneling
+Hypothesis
+A compromised internal host is attempting to exfiltrate sensitive data while bypassing firewall restrictions by using DNS Tunneling
+. The hypothesis is that malware is encoding data into DNS queries destined for an attacker-controlled domain
+.
+Data Source
+Sysmon: Event ID 22 (DNS Query) to tie lookups to specific processes
+.
+Network Traffic: Wireshark/PCAP data showing large volumes of DNS traffic
+.
+Wireshark Display Filter
+// Filter for abnormally long DNS query names
+dns.qry.name.len > 50
+Logic: Standard DNS queries are usually short; labels exceeding 50 characters often indicate encoded data
+.
+SPL (Splunk)
+index=sysmon EventCode=22 
+| eval query_len=len(QueryName) 
+| where query_len > 60
+| stats count, dc(QueryName) as unique_queries by Image, host
+| where unique_queries > 100
+Logic: Identifies processes making a high volume of uniquely named, long DNS requests, which is a signature of data being "chunked" and sent out
+.
+Findings
+An internal workstation was found sending 5,000+ unique DNS queries to a .xyz domain in 10 minutes
+. The process responsible was a suspicious executable in the %TEMP% folder, confirming a beaconing and exfiltration event
+.
+False Positives
+CDN/Tracking Traffic: Some Content Delivery Networks or ad-trackers use long, complex subdomains for load balancing
+.
+Antivirus Lookups: Certain AV products perform high-volume cloud-based lookups
+.
+MITRE ATT&CK
+Tactic: Command and Control (TA0011) / Exfiltration (TA0010)
+.
+Technique: Protocol Tunneling (T1572)
+.
+Detection Improvement
+I/O Graphing: Monitor for sudden "fire hose" spikes in DNS traffic using Wireshark’s I/O graphs
+.
+DNS Protection: Use a secure DNS resolver (e.g., Quad9) that blocks known malicious domains
+.
