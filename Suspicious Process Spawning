@@ -1,0 +1,42 @@
+Threat Hunt — Suspicious Process Spawning (Living-off-the-Land)
+Hypothesis
+An attacker is attempting to execute a malicious payload by exploiting a "Living-off-the-Land" (LotL) technique
+. The hypothesis is that a common office application (e.g., Word) has been weaponized to spawn a system shell or scripting interpreter to download further malware
+.
+Data Source
+Sysmon: Event ID 1 (Process Creation) to identify parent-child relationships
+.
+Windows Security: Event ID 4688 (New process created) with command-line auditing enabled
+.
+KQL (Microsoft Sentinel/Defender)
+// Hunting for Word/Excel spawning PowerShell or CMD
+DeviceProcessEvents
+| where InitiatingProcessFileName in~ ("winword.exe", "excel.exe", "outlook.exe")
+| where FileName in~ ("powershell.exe", "cmd.exe", "wscript.exe", "mshta.exe")
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, FileName, ProcessCommandLine
+Logic: This query identifies high-fidelity indicators of an initial access or execution phase by looking for productivity apps launching system tools
+.
+SPL (Splunk)
+index=windows_logs (EventCode=1 OR EventCode=4688) 
+ParentImage="*winword.exe" (Image="*powershell.exe" OR Image="*cmd.exe")
+| table _time, host, ParentImage, Image, CommandLine
+Logic: Filters for instances where Microsoft Word is the direct parent of a command shell, which is a rare behavior in normal business operations
+.
+Findings
+During the hunt, a workstation was flagged where winword.exe spawned powershell.exe with a -enc (encoded) command
+. Forensic analysis revealed the user opened a phishing attachment, triggering the execution of a fileless payload in memory
+.
+False Positives
+Administrative Macros: Legacy Excel documents used by finance departments that legitimately call system commands
+.
+Security Tooling: EDR or inventory agents that may occasionally trigger process events during updates
+.
+MITRE ATT&CK
+Tactic: Execution (TA0002).
+Technique: Command and Scripting Interpreter: PowerShell (T1059.001)
+.
+Detection Improvement
+Sigma Rule: Implement a rule to alert on any office process spawning an interpreter
+.
+GPO Hardening: Disable macros for all users except those with a specific business requirement
+.
