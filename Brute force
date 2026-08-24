@@ -1,0 +1,28 @@
+Brute force attacks are indeed highly detectable in modern security environments because they leave a distinct, high-volume trail of authentication failures across system and network logs
+.
+Here is why they are considered "good to detect" for a SOC analyst:
+1. The Windows "Smoking Gun": Event ID 4625
+In Windows environments, Event ID 4625 (Failed account logon) is the primary indicator of brute force activity
+.
+The Signature: A high-frequency stream of these events originating from a single source IP address is a classic indicator of an automated guessing tool
+.
+Successful Breach: A critical finding for any analyst is seeing multiple 4625 failures followed by a single Event ID 4624 (Successful logon) from the same source, which confirms the attacker successfully guessed the password
+.
+2. Protocol-Specific Detection
+Brute force isn't limited to Windows logons; it can be detected across various services by looking for similar patterns of volume:
+Web Applications: Analysts monitor for an excessive number of HTTP POST requests to login pages, which often signal an attempt to guess web credentials
+.
+FTP & SSH: High volumes of failed login attempts on Port 21 (FTP) or Port 22 (SSH) are clear markers of reconnaissance or credential access attempts
+.
+Domain Controllers: From a network perspective, Event ID 4771 (Kerberos pre-authentication failed) provides visibility into failed attempts at the domain level, often used by attackers to enumerate accounts
+.
+3. Advanced Hunting: Brute Force vs. Password Spraying
+As we discussed in our previous threat hunt, it is important to distinguish between two main types of credential attacks:
+Traditional Brute Force: Targets one account with many different passwords. This is very "loud" and often triggers account lockouts quickly [Conversation History].
+Password Spraying: This actor tests a single common password against a high volume of unique usernames. This is designed to stay below lockout thresholds and is harder to detect without correlating failures across multiple accounts [Conversation History].
+4. SIEM Detection Logic (SPL/KQL)
+Detecting these attacks is straightforward using SIEM queries. For example, in Splunk (SPL), you can find the most aggressive sources by aggregating failures: index=auth EventCode=4625 earliest=-24h | stats count by src_ip | sort - count
+.
+In Microsoft Sentinel (KQL), you can hunt for a single IP hitting multiple unique accounts within an hour to identify spraying: DeviceLogonEvents | where ActionType == "LogonFailed" | summarize FailedAccountCount = dcount(TargetUserName) by RemoteIP, bin(TimeGenerated, 1h) | where FailedAccountCount > 10 [Conversation History].
+5. Managing False Positives
+While brute force is easy to spot, analysts must be careful of Benign True Positives (BTP). Common false alarms include misconfigured service accounts with expired passwords that continue to attempt logons across various servers, generating a massive volume of failures that look malicious but are actually internal errors [386, Conversation History].
