@@ -1,0 +1,43 @@
+Threat Hunt — Persistence via New Service Installation
+Hypothesis
+A threat actor who has already gained administrative privileges is attempting to establish persistence or perform lateral movement
+. The hypothesis is that the actor is using tools like PsExec or custom scripts to install a new system service that will survive a reboot
+.
+Data Source
+Windows System Log: Event ID 7045 (A new service was installed)
+.
+Sysmon: Event ID 13 (Registry value set) to monitor changes to the Services registry hive
+.
+KQL (Microsoft Sentinel/Defender)
+// Detect new services with suspicious names or paths
+DeviceEvents
+| where ActionType == "ServiceInstalled"
+| where ServiceName matches regex @"^[a-zA-Z0-9]{8}$" or ServiceFileName contains "Temp"
+| project TimeGenerated, DeviceName, ServiceName, ServiceFileName, ServiceType
+Logic: Targets services with randomly generated names (common in Impacket/PsExec) or those running from temporary directories
+.
+SPL (Splunk)
+index=system EventCode=7045 
+| eval is_psexec=if(match(Service_Name,"psexesvc"),"Yes","No")
+| table _time, host, Service_Name, Service_File_Name, is_psexec
+Logic: Specifically identifies the installation of the PsExec service, a classic tool for remote command execution and lateral movement
+.
+Findings
+The hunt identified a new service named B6X9Z2R1 installed on a file server
+. The Service_File_Name pointed to a binary in C:\Windows\Temp, confirming an unauthorized lateral movement attempt using the Impacket framework
+.
+False Positives
+Software Updates: Legitimate applications or drivers that install temporary services during a patch
+.
+IT Administration: Authorized use of PsExec by the IT team for remote troubleshooting
+.
+MITRE ATT&CK
+Tactic: Persistence (TA0003) / Lateral Movement (TA0008)
+.
+Technique: Create or Modify System Process: System Service (T1543.003)
+.
+Detection Improvement
+Service Monitoring: Alert on any service creation where the AccountName is not a standard system account (e.g., LocalSystem)
+.
+Privileged Access: Restrict administrative permissions on endpoints to prevent unauthorized service installation
+.
